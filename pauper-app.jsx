@@ -55,7 +55,6 @@ function FieryTitle() {
   return (
     <h1 className="title fiery">
       <span className="title-line">Pauper Raid</span>
-      <span className="title-monthly">monatlich</span>
       <span className="title-line">am Dienstag</span>
     </h1>
   );
@@ -71,7 +70,6 @@ function IlluminatedTitle() {
         <span className="init">R</span>
         <span className="word">aid</span>
       </span>
-      <span className="title-monthly">monatlich</span>
       <span className="title-line">
         <span className="word">am&nbsp;</span>
         <span className="init">D</span>
@@ -85,7 +83,6 @@ function BannerTitle() {
   return (
     <div className="banner-stack">
       <BlockBanner lines={["PAUPER RAID", "AM DIENSTAG"]} />
-      <div className="title-monthly banner-monthly">monatlich</div>
     </div>
   );
 }
