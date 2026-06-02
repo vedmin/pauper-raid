@@ -1,39 +1,35 @@
 // pauper-app.jsx
-// Wednesday Pauper Raid — main React app
+// Pauper Raid am Dienstag — main React app
 
 const { useEffect, useMemo, useRef } = React;
 
 // ============================================================
-// Date helpers — next 6 "last Wednesday of the month"
+// Date helpers — next 6 "second Tuesday of the month"
 // ============================================================
 
 const MONTHS_LONG = [
-  'January','February','March','April','May','June',
-  'July','August','September','October','November','December'
+  'Januar','Februar','März','April','Mai','Juni',
+  'Juli','August','September','Oktober','November','Dezember'
 ];
 const MONTHS_SHORT = [
-  'Jan','Feb','Mar','Apr','May','Jun',
-  'Jul','Aug','Sep','Oct','Nov','Dec'
+  'Jan','Feb','Mär','Apr','Mai','Jun',
+  'Jul','Aug','Sep','Okt','Nov','Dez'
 ];
 
-function lastWednesdayOf(year, month) {
-  const lastDay = new Date(year, month + 1, 0);
-  const dow = lastDay.getDay();
-  const offset = (dow - 3 + 7) % 7;
-  return new Date(year, month, lastDay.getDate() - offset);
-}
-
-function ordinal(n) {
-  const s = ['th', 'st', 'nd', 'rd'];
-  const v = n % 100;
-  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+function secondTuesdayOf(year, month) {
+  // Find the first Tuesday, then add 7 days.
+  const firstDay = new Date(year, month, 1);
+  const dow = firstDay.getDay();
+  // Days to add to get to the first Tuesday (dow=2).
+  const offsetToFirstTue = (2 - dow + 7) % 7;
+  return new Date(year, month, 1 + offsetToFirstTue + 7);
 }
 
 function formatLong(date) {
-  return `${MONTHS_LONG[date.getMonth()]} ${ordinal(date.getDate())}`;
+  return `${date.getDate()}. ${MONTHS_LONG[date.getMonth()]}`;
 }
 function formatCard(date) {
-  return `${MONTHS_SHORT[date.getMonth()]} ${date.getDate()}`;
+  return `${date.getDate()}. ${MONTHS_SHORT[date.getMonth()]}`;
 }
 
 function getNextRaids(count) {
@@ -43,7 +39,7 @@ function getNextRaids(count) {
   let year = now.getFullYear();
   let month = now.getMonth();
   while (dates.length < count) {
-    const d = lastWednesdayOf(year, month);
+    const d = secondTuesdayOf(year, month);
     if (d >= now) dates.push(d);
     month += 1;
     if (month > 11) { month = 0; year += 1; }
@@ -58,9 +54,9 @@ function getNextRaids(count) {
 function FieryTitle() {
   return (
     <h1 className="title fiery">
-      <span className="title-line">Wednesday</span>
-      <span className="title-monthly">monthly</span>
       <span className="title-line">Pauper Raid</span>
+      <span className="title-monthly">monatlich</span>
+      <span className="title-line">am Dienstag</span>
     </h1>
   );
 }
@@ -70,15 +66,16 @@ function IlluminatedTitle() {
   return (
     <h1 className="title illuminated">
       <span className="title-line">
-        <span className="init">W</span>
-        <span className="word">ednesday</span>
-      </span>
-      <span className="title-monthly">monthly</span>
-      <span className="title-line">
         <span className="init">P</span>
         <span className="word">auper&nbsp;</span>
         <span className="init">R</span>
         <span className="word">aid</span>
+      </span>
+      <span className="title-monthly">monatlich</span>
+      <span className="title-line">
+        <span className="word">am&nbsp;</span>
+        <span className="init">D</span>
+        <span className="word">ienstag</span>
       </span>
     </h1>
   );
@@ -87,8 +84,8 @@ function IlluminatedTitle() {
 function BannerTitle() {
   return (
     <div className="banner-stack">
-      <BlockBanner lines={["WEDNESDAY", "PAUPER RAID"]} />
-      <div className="title-monthly banner-monthly">monthly</div>
+      <BlockBanner lines={["PAUPER RAID", "AM DIENSTAG"]} />
+      <div className="title-monthly banner-monthly">monatlich</div>
     </div>
   );
 }
@@ -148,7 +145,7 @@ function App() {
 
         <figure className="hero-art">
           <div className="hero-art-frame">
-            <img src="foglioblasts.jpg" alt="Two mages duel — fire and storm collide between them"/>
+            <img src="foglioblasts.jpg" alt="Zwei Magier im Duell — Feuer und Sturm prallen aufeinander"/>
           </div>
         </figure>
 
@@ -156,11 +153,11 @@ function App() {
           <div className="block-body">
             <div className="intro-box">
               <p className="lede">
-                A monthly Pauper tournament at <strong>Raid&rsquo;n&rsquo;Trade Karlsruhe</strong>.
+                Ein monatliches Pauper-Turnier bei <strong>Raid&rsquo;n&rsquo;Trade Karlsruhe</strong>.
               </p>
               <p className="cta-line">
-                Next raid: <strong className="next-date">{formatLong(nextRaid)}</strong>.<br/>
-                Doors open at <strong>18:00</strong>, first round at <strong>18:30</strong>.
+                Nächster Raid: <strong className="next-date">{formatLong(nextRaid)}</strong>.<br/>
+                Einlass ab <strong>18:00</strong>, erste Runde um <strong>18:30</strong>.
               </p>
             </div>
           </div>
@@ -172,26 +169,26 @@ function App() {
       {/* ───────── Details ───────── */}
       <section id="details" className="block">
         <div className="block-body">
-          <h2 className="section-title">The Details</h2>
+          <h2 className="section-title">Die Details</h2>
           <dl className="details">
-            <dt>When</dt>
-            <dd>The last Wednesday of every month. Doors 18:00, first round <strong>18:30</strong>.</dd>
+            <dt>Wann</dt>
+            <dd>Jeden zweiten Dienstag im Monat. Einlass 18:00, erste Runde <strong>18:30</strong>.</dd>
 
-            <dt>Where</dt>
+            <dt>Wo</dt>
             <dd>
               <strong>Raid&rsquo;n&rsquo;Trade</strong><br/>
               Schinnrainstra&szlig;e 9<br/>
               76227 Karlsruhe
             </dd>
 
-            <dt>Entry</dt>
-            <dd><strong>10&nbsp;&euro;</strong> per player.</dd>
+            <dt>Startgeld</dt>
+            <dd><strong>10&nbsp;&euro;</strong></dd>
 
-            <dt>Prizes</dt>
-            <dd><strong>2 booster packs per player</strong>, distributed by final standing.</dd>
+            <dt>Preise</dt>
+            <dd><strong>1 Booster pro Win</strong>, mindestens 1 Booster.</dd>
 
             <dt>Format</dt>
-            <dd>Pauper &mdash; commons only, 60-card deck, current banlist.</dd>
+            <dd>Pauper &mdash; nur Commons, 60-Karten-Deck, aktuelle Banlist.</dd>
           </dl>
         </div>
       </section>
@@ -201,13 +198,11 @@ function App() {
       {/* ───────── Schedule ───────── */}
       <section className="block">
         <div className="block-body">
-          <h2 className="section-title">Upcoming Raids</h2>
+          <h2 className="section-title">NEXT RAIDS</h2>
           <ul className="schedule">
             {raids.map((d, i) => (
               <li key={i} className={i === 0 ? 'next' : ''}>
-                <span className="sched-tag">
-                  {i === 0 ? 'Next' : d.getFullYear()}
-                </span>
+                <span className="sched-tag">{d.getFullYear()}</span>
                 {formatCard(d)}
               </li>
             ))}
@@ -219,31 +214,31 @@ function App() {
 
       {/* ───────── Footer ───────── */}
       <footer className="footer">
-        <p>Wednesday Pauper Raid &middot; hosted at Raid&rsquo;n&rsquo;Trade, Karlsruhe.</p>
+        <p>Pauper Raid am Dienstag &middot; bei Raid&rsquo;n&rsquo;Trade, Karlsruhe.</p>
       </footer>
 
       {/* ───────── Tweaks ───────── */}
       <TweaksPanel>
-        <TweakSection label="Background"/>
+        <TweakSection label="Hintergrund"/>
         <TweakSelect
-          label="Texture"
+          label="Textur"
           value={t.background}
           options={[
-            { value: 'parchment', label: 'Parchment' },
-            { value: 'spellbook', label: 'Spellbook' },
-            { value: 'tapestry',  label: 'Tapestry'  },
-            { value: 'mages',     label: 'Mage Duel' },
+            { value: 'parchment', label: 'Pergament' },
+            { value: 'spellbook', label: 'Zauberbuch' },
+            { value: 'tapestry',  label: 'Wandteppich'  },
+            { value: 'mages',     label: 'Magierduell' },
           ]}
           onChange={(v) => setTweak('background', v)}
         />
 
-        <TweakSection label="Title treatment"/>
+        <TweakSection label="Titel-Stil"/>
         <TweakRadio
-          label="Style"
+          label="Stil"
           value={t.title}
           options={[
-            { value: 'fiery',       label: 'Fiery' },
-            { value: 'illuminated', label: 'Illuminated' },
+            { value: 'fiery',       label: 'Feurig' },
+            { value: 'illuminated', label: 'Illuminiert' },
             { value: 'banner',      label: 'Banner' },
           ]}
           onChange={(v) => setTweak('title', v)}
