@@ -1,0 +1,857 @@
+/* ============================================================
+   Wednesday Pauper Raid — Raid'n'Trade Karlsruhe
+   Illuminated-manuscript / spellbook landing page
+   ============================================================ */
+
+:root {
+  /* Palette */
+  --parchment:        #ece6d4;
+  --parchment-warm:   #e0d7bd;
+  --parchment-deep:   #c6b994;
+  --ink:              #2a2014;
+  --ink-soft:         #4a3c28;
+  --ink-faint:        rgba(42, 32, 20, 0.55);
+  --gold:             #c9a24a;
+  --gold-bright:      #e8c870;
+  --gold-deep:        #8a6a1e;
+  --gold-shadow:      #5a4310;
+  --red:              #b22222;
+  --red-deep:         #7a1414;
+  --red-shadow:       #3a0a0a;
+  --blue:             #2a4ea8;
+  --blue-deep:        #16306e;
+  --blue-glow:        #6f8fd8;
+  --blue-pale:        #b0c0e6;
+
+  /* Spellbook (dark) */
+  --book-bg:          #15131e;
+  --book-bg-deep:     #0c0a14;
+  --book-page:        #f0e5c4;
+  --book-gold:        #d4b35a;
+
+  /* Tapestry */
+  --tap-bg:           #3a1622;
+  --tap-bg-deep:      #200810;
+  --tap-thread:       #d8b34a;
+  --tap-ivory:        #f0e0c0;
+  --tap-red:          #8a1a1a;
+
+  /* Layout */
+  --content-w:        780px;
+  --gutter:           5.5rem;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+body {
+  font-family: 'IM Fell English', Georgia, serif;
+  font-size: 19px;
+  line-height: 1.65;
+  color: var(--ink);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ============================================================
+   THEME — page-level wrapper for the 3 background variants
+   ============================================================ */
+
+.page {
+  position: relative;
+  min-height: 100vh;
+  isolation: isolate;
+  transition: background-color 600ms ease, color 600ms ease;
+}
+
+.page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  transition: opacity 800ms ease;
+}
+.page::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* ---- Parchment ---- */
+.page.bg-parchment {
+  color: var(--ink);
+  background: var(--parchment);
+}
+.page.bg-parchment::before {
+  /* Aged paper grain + vignette */
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255,240,200,0.55), transparent 55%),
+    radial-gradient(ellipse at 50% 100%, rgba(80,40,10,0.18), transparent 60%),
+    radial-gradient(ellipse at 0% 50%, rgba(80,40,10,0.10), transparent 55%),
+    radial-gradient(ellipse at 100% 50%, rgba(80,40,10,0.10), transparent 55%);
+}
+.page.bg-parchment::after {
+  /* Mana-pip watermark field */
+  background-image: var(--pip-watermark, none);
+  background-size: 200px 200px;
+  background-repeat: repeat;
+  opacity: 0.32;
+  animation: drift 90s linear infinite;
+}
+
+/* ---- Spellbook (dark) ---- */
+.page.bg-spellbook {
+  color: #ecd8a0;
+  background: var(--book-bg-deep);
+}
+.page.bg-spellbook::before {
+  background:
+    radial-gradient(ellipse at 50% 30%, #2a2336 0%, var(--book-bg) 35%, var(--book-bg-deep) 75%, #050309 100%),
+    repeating-linear-gradient(45deg, rgba(255,255,255,0.012) 0 2px, transparent 2px 6px);
+}
+.page.bg-spellbook::after {
+  background-image: var(--pip-watermark-gold, none);
+  background-size: 200px 200px;
+  background-repeat: repeat;
+  opacity: 0.10;
+  animation: drift 110s linear infinite reverse;
+}
+
+/* ---- Mage Duel (painting as ambient backdrop) ----
+   The painting is rendered as a real <img> + vignette <div> by the React
+   app (see App), not via ::before. The ::before pseudo on bg-mages is
+   left unused so we can layer the gold pip watermark only. */
+.page.bg-mages {
+  color: #fff5d8;
+  background: #0c060c;
+}
+.page.bg-mages::before { display: none; }
+.page.bg-mages::after { display: none; }
+
+/* Real fixed-position painting element */
+.mages-bg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 35%;
+  z-index: -3;
+  filter: blur(4px) saturate(1.08);
+  transform: scale(1.04);
+  pointer-events: none;
+}
+.mages-vignette {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 45%,
+      transparent 0%,
+      transparent 50%,
+      rgba(0,0,0,0.55) 100%);
+}
+.page.bg-tapestry {
+  color: var(--tap-ivory);
+  background: var(--tap-bg-deep);
+}
+.page.bg-tapestry::before {
+  background:
+    radial-gradient(ellipse at 50% 25%, #5a2230 0%, var(--tap-bg) 40%, var(--tap-bg-deep) 80%),
+    /* Woven weft + warp */
+    repeating-linear-gradient(0deg,
+      rgba(0,0,0,0.18) 0 1px,
+      transparent 1px 3px),
+    repeating-linear-gradient(90deg,
+      rgba(255,220,160,0.08) 0 1px,
+      transparent 1px 3px);
+}
+.page.bg-tapestry::after {
+  /* Diamond brocade pattern via gradients */
+  background-image:
+    repeating-linear-gradient(45deg,
+      rgba(216, 179, 74, 0.10) 0 1px, transparent 1px 22px),
+    repeating-linear-gradient(-45deg,
+      rgba(216, 179, 74, 0.10) 0 1px, transparent 1px 22px),
+    var(--pip-watermark-gold, none);
+  background-size: auto, auto, 200px 200px;
+  opacity: 0.7;
+  animation: drift 140s linear infinite;
+}
+
+/* subtle parchment drift */
+@keyframes drift {
+  from { background-position: 0 0, 0 0, 0 0; }
+  to   { background-position: 200px 220px, -200px 220px, 200px -220px; }
+}
+
+/* ============================================================
+   HERO ART — featured painting
+   ============================================================ */
+
+.hero-art {
+  margin: 1.2rem auto 2.4rem;
+  padding: 0 1.5rem;
+  max-width: 1180px;
+  display: flex;
+  justify-content: center;
+}
+
+.hero-art-frame {
+  position: relative;
+  width: 100%;
+  border: 8px solid var(--ink);
+  outline: 1px solid var(--gold-deep);
+  outline-offset: 6px;
+  box-shadow:
+    0 0 0 1px var(--gold-bright) inset,
+    0 0 0 9px var(--ink),                 /* ink ring (matches border) */
+    0 0 0 10px var(--gold-deep),          /* thin gold rule */
+    0 0 0 14px var(--parchment-deep),     /* parchment matte */
+    0 0 0 15px var(--gold-deep),          /* outer gold rule */
+    0 18px 40px rgba(0,0,0,0.35),
+    0 4px 12px rgba(0,0,0,0.25);
+  background: var(--ink);
+}
+
+.hero-art-frame::before,
+.hero-art-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+/* inner gold double rule */
+.hero-art-frame::before {
+  inset: 4px;
+  border: 1px solid var(--gold);
+  opacity: 0.6;
+}
+.hero-art-frame::after {
+  inset: 8px;
+  border: 0.5px solid var(--gold-bright);
+  opacity: 0.35;
+}
+
+.hero-art img {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* very slight aging filter to harmonize with parchment ground */
+  filter: saturate(0.96) contrast(1.02);
+}
+
+/* Dark backgrounds: lighter matte ring + warmer gold outline */
+.page.bg-spellbook .hero-art-frame {
+  border-color: #1a1322;
+  outline-color: var(--book-gold);
+  box-shadow:
+    0 0 0 1px var(--book-gold) inset,
+    0 0 0 9px #1a1322,
+    0 0 0 10px var(--book-gold),
+    0 0 0 14px #2a2336,
+    0 0 0 15px var(--book-gold),
+    0 18px 50px rgba(0,0,0,0.6),
+    0 4px 16px rgba(0,0,0,0.4);
+}
+.page.bg-spellbook .hero-art-frame::before { border-color: var(--book-gold); }
+.page.bg-spellbook .hero-art-frame::after  { border-color: #e8c870; }
+
+.page.bg-tapestry .hero-art-frame {
+  border-color: var(--tap-bg-deep);
+  outline-color: var(--tap-thread);
+  box-shadow:
+    0 0 0 1px var(--tap-thread) inset,
+    0 0 0 9px var(--tap-bg-deep),
+    0 0 0 10px var(--tap-thread),
+    0 0 0 14px #4a1828,
+    0 0 0 15px var(--tap-thread),
+    0 18px 50px rgba(0,0,0,0.6),
+    0 4px 16px rgba(0,0,0,0.4);
+}
+.page.bg-tapestry .hero-art-frame::before { border-color: var(--tap-thread); }
+.page.bg-tapestry .hero-art-frame::after  { border-color: #ffd070; }
+
+/* On the mage-duel ambient ground, hide the framed hero art —
+   the painting already IS the background, so showing it twice
+   reads as a duplication. Keep the spacer so layout doesn't snap. */
+.page.bg-mages .hero-art {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .hero-art { padding: 0 0.8rem; margin: 0.6rem auto 1.6rem; }
+  .hero-art-frame {
+    border-width: 5px;
+    outline-offset: 4px;
+    box-shadow:
+      0 0 0 1px var(--gold-bright) inset,
+      0 0 0 6px var(--ink),
+      0 0 0 7px var(--gold-deep),
+      0 0 0 10px var(--parchment-deep),
+      0 0 0 11px var(--gold-deep),
+      0 10px 24px rgba(0,0,0,0.3);
+  }
+}
+
+/* ============================================================
+   HERO TITLE — 3 treatments
+   ============================================================ */
+
+.hero {
+  padding: 1rem 1.5rem 0;
+}
+
+.title-wrap {
+  text-align: center;
+  margin: 1.5rem auto 2.2rem;
+  position: relative;
+}
+
+.title {
+  margin: 0;
+  line-height: 1;
+  letter-spacing: 0.015em;
+  display: block;
+}
+
+.title-eyebrow {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(0.78rem, 1.1vw, 0.95rem);
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin: 0 0 1.4rem;
+  color: var(--ink-soft);
+  opacity: 0.78;
+}
+.page.bg-spellbook .title-eyebrow { color: var(--book-gold); opacity: 0.85; }
+.page.bg-tapestry  .title-eyebrow { color: var(--tap-thread); opacity: 0.92; }
+.page.bg-mages     .title-eyebrow { color: #fff0c0; opacity: 1; text-shadow: 0 2px 12px rgba(0,0,0,0.9), 0 0 24px rgba(0,0,0,0.7); }
+
+/* ---- Treatment 1: Fiery red Cinzel ---- */
+.title.fiery {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-weight: 900;
+  color: var(--red);
+  text-shadow:
+    1px 1px 0 var(--gold),
+    2px 2px 0 var(--gold-deep),
+    3px 3px 0 var(--gold-shadow),
+    4px 5px 8px rgba(0,0,0,0.45);
+  -webkit-text-stroke: 1.5px var(--red-shadow);
+}
+.title.fiery .title-line {
+  display: block;
+  font-size: clamp(2.8rem, 9vw, 6.4rem);
+}
+.title.fiery .title-line + .title-line {
+  margin-top: 0.1em;
+}
+
+.title-monthly {
+  display: block;
+  font-family: var(--font-serif, Georgia, serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(0.85rem, 1.4vw, 1.05rem);
+  letter-spacing: 0.32em;
+  text-transform: lowercase;
+  text-indent: 0.32em;
+  margin: 0.2em 0 0.15em;
+  opacity: 0.78;
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+  color: inherit;
+}
+.title.fiery .title-monthly {
+  color: var(--ink, #2a1a08);
+  -webkit-text-stroke: 0;
+}
+.banner-stack { display: flex; flex-direction: column; align-items: center; }
+.banner-monthly { margin: 0.35em 0 0.1em; }
+.page.bg-spellbook .title.fiery {
+  color: #e84020;
+  text-shadow:
+    1px 1px 0 var(--book-gold),
+    2px 2px 0 #8a6a1e,
+    3px 3px 0 #3a2a08,
+    4px 5px 12px rgba(0,0,0,0.8);
+  -webkit-text-stroke: 1.5px #3a0808;
+}
+.page.bg-tapestry .title.fiery {
+  color: #f4d060;
+  text-shadow:
+    1px 1px 0 var(--tap-red),
+    2px 2px 0 #4a0808,
+    3px 3px 0 var(--tap-bg-deep),
+    4px 5px 12px rgba(0,0,0,0.65);
+  -webkit-text-stroke: 1px #3a0a0a;
+}
+.page.bg-mages .title.fiery {
+  color: #ffd060;
+  text-shadow:
+    1px 1px 0 #8a1414,
+    2px 2px 0 #3a0808,
+    3px 3px 0 #1a0408,
+    4px 6px 16px rgba(0,0,0,0.85),
+    0 0 28px rgba(255, 160, 40, 0.45);
+  -webkit-text-stroke: 1.5px #2a0a0a;
+}
+
+/* ---- Treatment 2: Illuminated initials ---- */
+.title.illuminated {
+  font-family: 'IM Fell English', 'Cinzel', serif;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--ink);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+}
+.title.illuminated .title-line {
+  display: block;
+  margin: 0.05em 0;
+}
+.title.illuminated .init {
+  display: inline-block;
+  vertical-align: -0.18em;
+  font-family: 'UnifrakturCook', 'Cinzel Decorative', serif;
+  font-weight: 700;
+  font-style: normal;
+  color: #fff7d4;
+  background:
+    radial-gradient(circle at 30% 25%, #e84020 0%, var(--red-deep) 45%, var(--red-shadow) 100%);
+  width: 1.4em;
+  height: 1.4em;
+  line-height: 1.4em;
+  font-size: 1.45em;
+  text-align: center;
+  margin-right: 0.18em;
+  border: 3px solid var(--gold);
+  outline: 2px solid var(--gold-deep);
+  outline-offset: 0;
+  box-shadow:
+    inset 0 0 0 2px var(--gold-bright),
+    inset 0 0 18px rgba(0,0,0,0.5),
+    0 4px 8px rgba(0,0,0,0.35);
+  text-shadow: 1px 1px 0 var(--red-shadow), 2px 2px 4px rgba(0,0,0,0.6);
+  position: relative;
+}
+.title.illuminated .init::before,
+.title.illuminated .init::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid rgba(255, 220, 130, 0.55);
+  pointer-events: none;
+}
+.title.illuminated .init::after {
+  inset: 9px;
+  border-color: rgba(255, 220, 130, 0.25);
+}
+.title.illuminated .word {
+  letter-spacing: 0.02em;
+}
+.page.bg-spellbook .title.illuminated {
+  color: var(--book-page);
+}
+.page.bg-tapestry .title.illuminated {
+  color: var(--tap-ivory);
+}
+.page.bg-mages .title.illuminated {
+  color: #fff5d0;
+  text-shadow: 0 2px 14px rgba(0,0,0,0.8);
+}
+
+/* ---- Treatment 3: Block-printed banner ---- */
+.title.block-banner {
+  font-family: 'Cinzel', serif;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.title.block-banner .banner-svg {
+  display: block;
+  width: min(720px, 92vw);
+  height: auto;
+  margin: 0 auto;
+}
+.title.block-banner .banner-text {
+  font-family: 'Cinzel', serif;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  fill: #1a1208;
+}
+
+/* ============================================================
+   ORNAMENTAL DIVIDER (blue gem rule)
+   ============================================================ */
+
+.divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 2.5rem auto;
+  max-width: 1100px;
+  padding: 0 2rem;
+  gap: 0;
+}
+
+.divider svg {
+  display: block;
+  width: 100%;
+  max-width: 980px;
+  height: 44px;
+  overflow: visible;
+}
+
+.page.bg-spellbook .hero-art { display: none; }
+
+.page.bg-spellbook .divider svg .div-rod { stroke: var(--book-gold); }
+.page.bg-spellbook .divider svg .div-rod-shadow { stroke: #5a4310; }
+.page.bg-tapestry  .divider svg .div-rod { stroke: var(--tap-thread); }
+.page.bg-tapestry  .divider svg .div-rod-shadow { stroke: #4a2210; }
+
+/* ============================================================
+   CONTENT BLOCKS
+   ============================================================ */
+
+.block {
+  position: relative;
+  max-width: var(--content-w);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.block-body {
+  text-align: left;
+}
+
+.block-body p {
+  margin: 0.75em 0;
+  text-wrap: pretty;
+}
+
+.lede {
+  font-size: 1.08em;
+}
+
+.cta-line {
+  margin-top: 1.4em;
+  font-size: 1.02em;
+}
+
+.section-title {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  text-align: center;
+  font-size: clamp(1.4rem, 2.6vw, 1.95rem);
+  margin: 0 0 1.3rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.page.bg-spellbook .section-title { color: var(--book-gold); }
+.page.bg-tapestry  .section-title { color: var(--tap-thread); }
+.page.bg-mages     .section-title { color: #ffd070; text-shadow: 0 2px 10px rgba(0,0,0,0.75); }
+
+a {
+  color: var(--blue-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: color 200ms ease;
+}
+a:hover { color: var(--red-deep); }
+.page.bg-spellbook a { color: var(--book-gold); }
+.page.bg-spellbook a:hover { color: #e84020; }
+.page.bg-tapestry a { color: var(--tap-thread); }
+.page.bg-tapestry a:hover { color: #f4d060; }
+.page.bg-mages a { color: #ffd070; }
+.page.bg-mages a:hover { color: #ff8030; }
+
+.next-date {
+  color: var(--red-deep);
+  white-space: nowrap;
+}
+.page.bg-spellbook .next-date { color: #e84020; }
+.page.bg-tapestry  .next-date { color: var(--tap-thread); }
+.page.bg-mages     .next-date { color: #ff8030; }
+
+strong { color: inherit; font-weight: 700; }
+
+/* ============================================================
+   GEM SIGILS (replace the old torches)
+   ============================================================ */
+
+.gem-sigil {
+  position: absolute;
+  top: 0.25rem;
+  width: 54px;
+  height: 200px;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 6px rgba(10, 24, 64, 0.35));
+}
+.gem-left  { left: 0.6rem; }
+.gem-right { right: 0.6rem; }
+
+.gem-sigil svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  animation: gem-pulse 4.4s ease-in-out infinite;
+  transform-origin: 50% 32%; /* pivot near the gem */
+}
+
+@keyframes gem-pulse {
+  0%, 100% { transform: scale(1);    opacity: 0.95; }
+  50%      { transform: scale(1.05); opacity: 1; }
+}
+
+.no-flicker .gem-sigil svg { animation: none; }
+
+/* On dark backgrounds, swap the ink-on-blue strokes to gold for contrast.
+   Strokes are set on parent <g> elements and inherited by children — use
+   attribute selector with no tag restriction so it catches both. */
+.page.bg-spellbook .gem-sigil svg [stroke="#16306e"] {
+  stroke: var(--book-gold);
+}
+.page.bg-spellbook .gem-sigil svg [fill="#16306e"]   { fill: var(--book-gold); }
+.page.bg-spellbook .gem-sigil svg [fill="#3960c0"]   { fill: #e8c870; }
+.page.bg-spellbook .gem-sigil { filter: drop-shadow(0 2px 8px rgba(212, 179, 90, 0.45)); }
+
+.page.bg-tapestry .gem-sigil svg [stroke="#16306e"] {
+  stroke: var(--tap-thread);
+}
+.page.bg-tapestry .gem-sigil svg [fill="#16306e"]   { fill: var(--tap-thread); }
+.page.bg-tapestry .gem-sigil svg [fill="#3960c0"]   { fill: #f0d070; }
+.page.bg-tapestry .gem-sigil { filter: drop-shadow(0 2px 8px rgba(216, 179, 74, 0.45)); }
+
+/* ============================================================
+   DETAILS LIST
+   ============================================================ */
+
+.details,
+.intro-box {
+  margin: 1rem 0 0;
+  padding: 1.4rem 1.6rem;
+  border: 1px solid currentColor;
+  border-color: rgba(42, 32, 20, 0.22);
+  background: rgba(255,250,235, 0.3);
+  border-radius: 2px;
+  position: relative;
+}
+.details {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: 1.8rem;
+  row-gap: 0.85rem;
+}
+.intro-box > :first-child { margin-top: 0; }
+.intro-box > :last-child  { margin-bottom: 0; }
+.details::before,
+.details::after,
+.intro-box::before,
+.intro-box::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(42, 32, 20, 0.15);
+  pointer-events: none;
+}
+.details::after,
+.intro-box::after {
+  inset: 8px;
+  border-color: rgba(42, 32, 20, 0.08);
+}
+
+.page.bg-spellbook .details,
+.page.bg-spellbook .intro-box {
+  border-color: rgba(212, 179, 90, 0.35);
+  background: rgba(40, 30, 18, 0.35);
+}
+.page.bg-spellbook .details::before,
+.page.bg-spellbook .intro-box::before { border-color: rgba(212, 179, 90, 0.22); }
+.page.bg-spellbook .details::after,
+.page.bg-spellbook .intro-box::after  { border-color: rgba(212, 179, 90, 0.12); }
+
+.page.bg-tapestry .details,
+.page.bg-tapestry .intro-box {
+  border-color: rgba(216, 179, 74, 0.45);
+  background: rgba(20, 6, 12, 0.45);
+}
+.page.bg-tapestry .details::before,
+.page.bg-tapestry .intro-box::before { border-color: rgba(216, 179, 74, 0.28); }
+.page.bg-tapestry .details::after,
+.page.bg-tapestry .intro-box::after  { border-color: rgba(216, 179, 74, 0.15); }
+
+.page.bg-mages .details,
+.page.bg-mages .intro-box {
+  border-color: rgba(255, 208, 112, 0.55);
+  background: rgba(10, 4, 10, 0.72);
+  backdrop-filter: blur(10px) saturate(1.1);
+  -webkit-backdrop-filter: blur(10px) saturate(1.1);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+}
+.page.bg-mages .details::before,
+.page.bg-mages .intro-box::before { border-color: rgba(255, 208, 112, 0.28); }
+.page.bg-mages .details::after,
+.page.bg-mages .intro-box::after  { border-color: rgba(255, 208, 112, 0.14); }
+.page.bg-mages .details dt { color: #ffd070; }
+.page.bg-mages .details dd { color: #f4ead0; }
+
+.details dt {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.86rem;
+  padding-top: 0.18rem;
+  color: var(--red-deep);
+}
+.page.bg-spellbook .details dt { color: var(--book-gold); }
+.page.bg-tapestry  .details dt { color: var(--tap-thread); }
+
+.details dd {
+  margin: 0;
+  font-size: 1rem;
+}
+
+/* ============================================================
+   SCHEDULE
+   ============================================================ */
+
+.schedule {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0.7rem;
+}
+
+.schedule li {
+  padding: 0.7rem 0.9rem;
+  background: rgba(255, 250, 235, 0.3);
+  border: 1px solid rgba(42, 78, 168, 0.32);
+  font-family: 'Cinzel', serif;
+  font-weight: 500;
+  text-align: center;
+  letter-spacing: 0.04em;
+  position: relative;
+  border-radius: 1px;
+}
+.schedule li::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(42, 78, 168, 0.18);
+  pointer-events: none;
+}
+
+.schedule li.next {
+  background:
+    linear-gradient(180deg, rgba(255, 240, 200, 0.6), rgba(255, 220, 160, 0.45));
+  border-color: var(--red-deep);
+  color: var(--red-deep);
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(122, 20, 20, 0.18);
+}
+.schedule li.next::before { border-color: rgba(122, 20, 20, 0.32); }
+
+.schedule li .sched-tag {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  margin-bottom: 0.18rem;
+  opacity: 0.62;
+  font-weight: 600;
+}
+.schedule li.next .sched-tag { opacity: 1; }
+
+.page.bg-spellbook .schedule li {
+  background: rgba(40, 30, 18, 0.35);
+  border-color: rgba(212, 179, 90, 0.32);
+  color: #e2d4a8;
+}
+.page.bg-spellbook .schedule li::before { border-color: rgba(212, 179, 90, 0.18); }
+.page.bg-spellbook .schedule li.next {
+  background: linear-gradient(180deg, rgba(232, 64, 32, 0.22), rgba(80, 20, 8, 0.4));
+  border-color: #e84020;
+  color: #ffd070;
+}
+
+.page.bg-tapestry .schedule li {
+  background: rgba(20, 6, 12, 0.4);
+  border-color: rgba(216, 179, 74, 0.42);
+  color: var(--tap-ivory);
+}
+.page.bg-tapestry .schedule li::before { border-color: rgba(216, 179, 74, 0.22); }
+.page.bg-tapestry .schedule li.next {
+  background: linear-gradient(180deg, rgba(216, 179, 74, 0.28), rgba(58, 22, 34, 0.6));
+  border-color: var(--tap-thread);
+  color: #ffe8a8;
+}
+
+.page.bg-mages .schedule li {
+  background: rgba(10, 4, 10, 0.7);
+  border-color: rgba(255, 208, 112, 0.52);
+  color: #fff5d8;
+  backdrop-filter: blur(10px) saturate(1.1);
+  -webkit-backdrop-filter: blur(10px) saturate(1.1);
+}
+.page.bg-mages .schedule li::before { border-color: rgba(255, 208, 112, 0.22); }
+.page.bg-mages .schedule li.next {
+  background: linear-gradient(180deg, rgba(255, 128, 48, 0.32), rgba(40, 12, 8, 0.7));
+  border-color: #ff8030;
+  color: #ffd070;
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+
+.footer {
+  text-align: center;
+  margin: 3rem auto 2.2rem;
+  font-style: italic;
+  font-size: 0.98rem;
+  font-weight: 500;
+  opacity: 1;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+}
+.page.bg-parchment .footer { color: #2a1a08; text-shadow: none; }
+.page.bg-spellbook .footer { color: #f3dca0; }
+.page.bg-tapestry  .footer { color: #f6d68a; }
+.page.bg-mages     .footer { color: #ffe0a8; text-shadow: 0 1px 3px rgba(0,0,0,0.7); }
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 720px) {
+  body { font-size: 17px; }
+  :root { --gutter: 1.3rem; }
+  .block { padding: 0 var(--gutter); }
+  .gem-sigil { display: none; }
+  .divider { padding: 0 0.8rem; margin: 1.6rem auto; }
+  .divider svg { height: 32px; }
+  .details { padding: 1.1rem 1rem; column-gap: 1rem; }
+  .details dt { font-size: 0.78rem; }
+  .lede::first-letter { font-size: 3em; }
+  .title.illuminated .init {
+    font-size: 1.25em;
+    width: 1.35em;
+    height: 1.35em;
+    line-height: 1.35em;
+  }
+  .title-eyebrow { letter-spacing: 0.28em; font-size: 0.74rem; }
+}
+
+@media (max-width: 480px) {
+  .schedule { grid-template-columns: 1fr; }
+}
