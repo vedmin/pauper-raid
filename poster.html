@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Pauper Raid am Dienstag — Poster</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Cinzel+Decorative:wght@700;900&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold:        #c9a24a;
+    --gold-bright: #e8c870;
+    --red:         #e84020;
+    --book-bg:     #15131e;
+    --book-bg-deep:#0c0a14;
+    --book-gold:   #d4b35a;
+    --text:        #ecd8a0;
+    --w: 800px;
+  }
+
+  html, body {
+    width: var(--w);
+    margin: 0 auto;
+    background: #000;
+  }
+
+  .poster {
+    width: var(--w);
+    min-height: var(--w);          /* square */
+    background: var(--book-bg-deep);
+    color: var(--text);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.6;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 2.5rem 0;
+  }
+
+  /* ── background gradient ── */
+  .poster::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse at 50% 25%, #2a2336 0%, var(--book-bg) 35%, var(--book-bg-deep) 75%, #050309 100%),
+      repeating-linear-gradient(45deg, rgba(255,255,255,0.012) 0 2px, transparent 2px 6px);
+  }
+
+  .poster > * { position: relative; z-index: 1; }
+
+  /* ── ornamental rule ── */
+  .rule {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3rem;
+    margin: 1.6rem 0;
+  }
+  .rule svg { width: 100%; height: 36px; overflow: visible; }
+
+  /* ── eyebrow ── */
+  .eyebrow {
+    text-align: center;
+    font-family: 'Cinzel', serif;
+    font-size: 0.82rem;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--book-gold);
+    opacity: 0.88;
+  }
+
+  /* ── main title ── */
+  .title {
+    text-align: center;
+    font-family: 'Cinzel Decorative', 'Cinzel', serif;
+    font-weight: 900;
+    color: var(--red);
+    text-shadow:
+      1px 1px 0 var(--book-gold),
+      2px 2px 0 #8a6a1e,
+      3px 3px 0 #3a2a08,
+      4px 5px 12px rgba(0,0,0,0.8);
+    -webkit-text-stroke: 1.5px #3a0808;
+    line-height: 1;
+    margin: 0.6rem 0 0;
+    padding: 0 1.5rem;
+  }
+  .title .line { display: block; font-size: 4.4rem; }
+  .title .line + .line { margin-top: 0.08em; }
+
+  /* ── details box ── */
+  .content { padding: 0 3.5rem; }
+
+  .box {
+    border: 1px solid rgba(212,179,90,0.38);
+    background: rgba(40,30,18,0.4);
+    padding: 1.6rem 1.8rem;
+    position: relative;
+    border-radius: 1px;
+  }
+  .box::before {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border: 1px solid rgba(212,179,90,0.2);
+    pointer-events: none;
+  }
+
+  .details {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    column-gap: 1.6rem;
+    row-gap: 0.9rem;
+  }
+  .details dt {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--book-gold);
+    padding-top: 0.15rem;
+  }
+  .details dd { font-size: 0.98em; color: var(--text); }
+  .details dd strong { color: var(--gold-bright); }
+
+  /* ── url footer ── */
+  .url-footer {
+    text-align: center;
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.22em;
+    color: var(--book-gold);
+    opacity: 0.82;
+  }
+</style>
+</head>
+<body>
+<div class="poster">
+
+  <div class="rule" data-rule></div>
+
+  <p class="eyebrow">Raid&rsquo;n&rsquo;Trade &middot; Karlsruhe</p>
+
+  <div class="title">
+    <span class="line">Pauper Raid</span>
+    <span class="line">am Dienstag</span>
+  </div>
+
+  <div class="rule" data-rule></div>
+
+  <div class="content">
+    <div class="box">
+      <dl class="details">
+        <dt>Wo</dt>
+        <dd><strong>Raid&rsquo;n&rsquo;Trade</strong> &mdash; Schinnrainstra&szlig;e 9, 76227 Karlsruhe</dd>
+
+        <dt>Wann</dt>
+        <dd id="recurrence">—</dd>
+
+        <dt>N&auml;chster Raid</dt>
+        <dd><strong id="next-date">—</strong> &mdash; Einlass <strong>18:00</strong>, erste Runde <strong>18:30</strong></dd>
+
+        <dt>Startgeld</dt>
+        <dd><strong>10 &euro;</strong></dd>
+
+        <dt>Preise</dt>
+        <dd><strong>1 Booster pro Win</strong>, mindestens 1 Booster</dd>
+
+        <dt>Format</dt>
+        <dd>Pauper &mdash; nur Commons, 60-Karten-Deck, aktuelle Banlist</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="rule" data-rule></div>
+
+  <p class="url-footer">mtgpauperraid.space</p>
+
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+//  PER-EVENT CONFIG
+//  Both values can be overridden on render via URL query params:
+//    ?date=2026-07-08          → the highlighted event date
+//    ?recur=Am%20zweiten%20…   → the "Wann" recurrence line
+//  Leave `date` empty to auto-compute the next 2nd Tuesday.
+// ─────────────────────────────────────────────────────────────
+const params = new URLSearchParams(location.search);
+const CONFIG = {
+  date:       params.get('date')  || '',                             // 'YYYY-MM-DD' or '' for auto
+  recurrence: params.get('recur') || 'Am zweiten Dienstag des Monats'
+};
+
+const MONTHS_LONG = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+
+function secondTuesdayOf(year, month) {
+  const dow = new Date(year, month, 1).getDay();
+  const offsetToFirstTue = (2 - dow + 7) % 7;
+  return new Date(year, month, 1 + offsetToFirstTue + 7);
+}
+
+function nextSecondTuesday() {
+  const now = new Date(); now.setHours(0,0,0,0);
+  let year = now.getFullYear(), month = now.getMonth();
+  for (;;) {
+    const d = secondTuesdayOf(year, month);
+    if (d >= now) return d;
+    if (++month > 11) { month = 0; year++; }
+  }
+}
+
+const eventDate = CONFIG.date
+  ? (() => { const [y,m,d] = CONFIG.date.split('-').map(Number); return new Date(y, m - 1, d); })()
+  : nextSecondTuesday();
+
+document.getElementById('next-date').textContent =
+  eventDate.getDate() + '. ' + MONTHS_LONG[eventDate.getMonth()];
+document.getElementById('recurrence').textContent = CONFIG.recurrence;
+
+// ── ornamental divider (inserted once, cloned into each .rule) ──
+const RULE_SVG = `
+<svg viewBox="0 0 740 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="ll" x1="0" y1="0" x2="310" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#d4b35a" stop-opacity="0"/>
+      <stop offset="18%" stop-color="#d4b35a" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#d4b35a" stop-opacity="1"/>
+    </linearGradient>
+    <linearGradient id="lr" x1="430" y1="0" x2="740" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#d4b35a" stop-opacity="1"/>
+      <stop offset="82%" stop-color="#d4b35a" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#d4b35a" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="sl" x1="0" y1="0" x2="310" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#3a2810" stop-opacity="0"/>
+      <stop offset="18%" stop-color="#3a2810" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#3a2810" stop-opacity="0.55"/>
+    </linearGradient>
+    <linearGradient id="sr" x1="430" y1="0" x2="740" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#3a2810" stop-opacity="0.55"/>
+      <stop offset="82%" stop-color="#3a2810" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#3a2810" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <line x1="0" y1="19.5" x2="310" y2="19.5" stroke="url(#sl)" stroke-width="1.5"/>
+  <line x1="430" y1="19.5" x2="740" y2="19.5" stroke="url(#sr)" stroke-width="1.5"/>
+  <line x1="0" y1="18" x2="310" y2="18" stroke="url(#ll)" stroke-width="1.5"/>
+  <line x1="430" y1="18" x2="740" y2="18" stroke="url(#lr)" stroke-width="1.5"/>
+  <polygon points="370,4 382,18 370,32 358,18" fill="#16306e" stroke="#d4b35a" stroke-width="1.5"/>
+  <polygon points="370,8 379,18 370,28 361,18" fill="#3960c0" stroke="#6f8fd8" stroke-width="0.75"/>
+  <circle cx="370" cy="18" r="3" fill="#b0c0e6"/>
+  <polygon points="348,10 355,18 348,26 341,18" fill="#d4b35a" stroke="#8a6a1e" stroke-width="1.2"/>
+  <polygon points="392,10 399,18 392,26 385,18" fill="#d4b35a" stroke="#8a6a1e" stroke-width="1.2"/>
+</svg>`;
+document.querySelectorAll('[data-rule]').forEach(el => { el.innerHTML = RULE_SVG; });
+</script>
+</body>
+</html>
